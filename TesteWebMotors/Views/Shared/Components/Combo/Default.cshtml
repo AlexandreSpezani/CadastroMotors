@@ -1,0 +1,4 @@
+﻿@model TesteWebMotors.Models.ComboViewModel
+
+<label>@Model.Label</label>
+@Html.DropDownList(Model.Id, Model.ListaProcessada, new { @class = "form-control" })

@@ -1,0 +1,104 @@
+﻿@model TesteWebMotors.Models.AnuncioViewModel
+
+@{
+    ViewData["Title"] = "Anúncio";
+}
+
+@section scripts{
+
+    <script>
+        $(document).ready(function () {
+            $('#select_marca option:contains("@Model.Anuncio.Marca")').prop('selected', true);
+            $("#select_modelo").html('<option selected value="0">@Model.Anuncio.Modelo</option>');
+            $("#select_versao").html('<option selected value="0">@Model.Anuncio.Versao</option>');
+
+            $('#select_marca').change(function () {
+                var makerId = $(this).val();
+                var select = $(this)
+                $.ajax({
+                    url: "@Url.Action("ComboModel", "Anuncio")?makerId=" + makerId,
+                    dataType: 'html',
+                    success: function (result) {
+                        $('#combo-model-wrapper').html(result);
+                        $('#anuncio_marca').val($(select).find('option:selected').text());
+                    }
+                })
+            });
+
+            $(document).on("change", "#select_modelo", function () {
+                var makerId = $(this).val();
+                var select = $(this)
+
+                $.ajax({
+                    url: "@Url.Action("ComboVersion","Anuncio")?modelId=" + makerId,
+                    dataType: 'html',
+                    success: function (result) {
+                        $('#combo-version-wrapper').html(result);
+                        $('#anuncio_modelo').val($(select).find('option:selected').text());
+                    }
+                })
+            });
+
+            $(document).on("change", "#select_versao", function () {
+                var select = $(this)
+                $('#anuncio_versao').val($(select).find('option:selected').text());
+            });
+        });
+
+         function excluirAnuncio(id) {
+                 $.ajax({
+                    url: "@Url.Action("Excluir","Anuncio")?id=" + id,
+                    dataType: 'json',
+                    success: function (result) {;
+                        alert(`o anuncio ${result.id} foi excluído com sucesso`);
+                        location.reload("@Url.Action("Index","Anuncio")");
+                    }
+                })
+          }
+    </script>
+
+}
+
+
+<div class="container">
+    <h1 class="title"> Criar anúncio</h1>
+
+    <form asp-action="Editar" method="POST" asp-controller="Anuncio">
+
+        @Html.HiddenFor(m => m.Anuncio.Id)
+        <input type="hidden" id="anuncio_marca" name="anuncio.marca" />
+        <input type="hidden" id="anuncio_modelo" name="anuncio.modelo" />
+        <input type="hidden" id="anuncio_versao" name="anuncio.versao" />
+
+        <div class="form-group col-md-4">
+            <vc:combo-maker></vc:combo-maker>
+        </div>
+
+        <div class="form-group col-md-4" id="combo-model-wrapper">
+            <vc:combo-model maker-id="0"></vc:combo-model>
+        </div>
+
+        <div class="form-group col-md-4" id="combo-version-wrapper">
+            <vc:combo-version model-id="0"></vc:combo-version>
+        </div>
+
+        <div class="form-group col-md-4" id="combo-version-wrapper">
+            <label>Ano</label>
+            @Html.TextBoxFor(m => m.Anuncio.Ano, new { @class = "form-control", @type = "number" })
+        </div>
+
+        <div class="form-group col-md-4" id="combo-version-wrapper">
+            <label>Quilometragem</label>
+            @Html.TextBoxFor(m => m.Anuncio.Quilometragem, new { @class = "form-control", @type = "number" })
+        </div>
+
+        <div class="form-group col-md-4" id="combo-version-wrapper">
+            <label>Observação</label>
+            @Html.TextAreaFor(m => m.Anuncio.Observacao, new { @class = "form-control" })
+        </div>
+
+        <div class="form-group col-md-12">
+            <button type="submit" class="btn btn-default pull-right">Enviar</button>
+        </div>
+    </form>
+</div>
